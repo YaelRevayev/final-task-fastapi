@@ -1,52 +1,60 @@
+
+from typing import List
 import logging
 from fastapi import FastAPI, UploadFile, File
 import hashlib
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
-from typing import List
 
 app = FastAPI()
-logging.basicConfig(filename='fast-api-server.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+logging.basicConfig(filename='fastapi_server.log', level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
+
+def read_key_from_file(filepath):
+    # Read the key from the file
+    with open(filepath, "rb") as key_file:
+        key = key_file.read()
+
+    # Check if the key length is valid for AES-256 (32 bytes)
+    if len(key) == 32:
+        return key
+    elif len(key) > 32:
+        # If the key is longer than 32 bytes, truncate it
+        return key[:32]
+    else:
+        # If the key is shorter than 32 bytes, pad it with zeros
+        return key.ljust(32, b'\0')
+
+def sign_file(content, key):
+    sha512_hash = hashlib.sha512(content).hexdigest()
+    iv = get_random_bytes(16)
+    cipher = AES.new(key, AES.MODE_CFB, iv)
+    encrypted_hash = cipher.encrypt(sha512_hash.encode())
+    return encrypted_hash, iv
 
 @app.post("/merge_and_sign")
 async def merge_and_sign(files: List[UploadFile] = File(...)):
     try:
-        merged_content = await merge_files(files)
-        sha512_hash = hashlib.sha512(merged_content).hexdigest()
-        iv = get_random_bytes(16)
-        aes_cipher = AES.new(read_key_from_file("tornado.key"), AES.MODE_CFB, iv)
-        encrypted_content = aes_cipher.encrypt(sha512_hash)
+        content1 = await files[0].read()
+        content2 = await files[1].read()
 
-        filename = create_new_file_name(files[1].filename)
-        with open("./final-files/{name}".format(name=filename), "wb") as f:
-            f.write(iv)
+        # Merge file contents
+        merged_content = content1 + content2
 
-        with open("./final-files/{name}".format(name=filename), "ab") as f:
-            f.write(encrypted_content)
+        # Read the secret key from file
+        key = read_key_from_file("tornado.key")
 
-        logging.info("Files merged, signed, and encrypted successfully.: %s", filename)
-    
+        # Sign the merged content
+        encrypted_hash, iv = sign_file(merged_content, key)
+
+        merged_filename = files[1].filename.replace("_b", ".jpg")
+        with open("merged_files/" + merged_filename, "wb") as f:
+            f.write(merged_content + encrypted_hash + iv)
+
+        logging.info("Consolidated file saved: %s", merged_filename)
+        return {"message": "Consolidated file saved successfully."}
     except Exception as e:
         logging.error("An error occurred: %s", str(e))
-    
-def read_key_from_file(filepath):
-    key_file = open(filepath, "rb")
-    data = key_file.read() 
-    key_file.close()
-    return data
-
-def create_new_file_name(second_file_name):
-    return second_file_name[:2] + '.jpg'
-
-async def merge_files(files):
-    file_contents = []
-    for file in files:
-        file_contents.append(await file.read())
-    return b"".join(file_contents)
-
-
-def main():
-    pass
+        return {"error": "An error occurred while processing the request."}
 
 if __name__ == "__main__":
     import uvicorn
