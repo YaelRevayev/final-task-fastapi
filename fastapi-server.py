@@ -45,5 +45,7 @@ async def merge_and_sign(files: List[UploadFile] = File(...)):
         error_logger.error("An error occurred: %s", str(e))
 
 if __name__ == "__main__":
+    reset_folder("logs")
+    reset_folder("merged_files")
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
