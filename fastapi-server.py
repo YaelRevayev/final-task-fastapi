@@ -6,8 +6,6 @@ from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 
 app = FastAPI()
-info_logger = configure_success_logger()
-error_logger= configure_error_logger()
 
 def read_key_from_file(filepath):
     with open(filepath, "rb") as key_file:
@@ -28,6 +26,8 @@ def sign_file(content, key):
 
 @app.post("/merge_and_sign")
 async def merge_and_sign(files: List[UploadFile] = File(...)):
+    info_logger = configure_success_logger()
+    error_logger= configure_error_logger()
     try:
         content1 = await files[0].read()
         content2 = await files[1].read()

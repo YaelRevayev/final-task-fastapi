@@ -9,7 +9,7 @@ def reset_folder(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
         os.makedirs(directory)
-    else:
+    elif not os.path.exists(directory):
         os.makedirs(directory)
 
 def configure_error_logger():
