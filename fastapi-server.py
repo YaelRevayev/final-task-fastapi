@@ -6,6 +6,8 @@ from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 
 app = FastAPI()
+global info_logger
+global error_logger
 
 def read_key_from_file(filepath):
     with open(filepath, "rb") as key_file:
@@ -26,8 +28,6 @@ def sign_file(content, key):
 
 @app.post("/merge_and_sign")
 async def merge_and_sign(files: List[UploadFile] = File(...)):
-    info_logger = configure_success_logger()
-    error_logger= configure_error_logger()
     try:
         content1 = await files[0].read()
         content2 = await files[1].read()
@@ -44,8 +44,16 @@ async def merge_and_sign(files: List[UploadFile] = File(...)):
     except Exception as e:
         error_logger.error("An error occurred: %s", str(e))
 
-if __name__ == "__main__":
+
+def main():
     reset_folder("logs")
     reset_folder("merged_files")
+    global info_logger
+    global error_logger
+    info_logger = configure_success_logger()
+    error_logger= configure_error_logger()
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    main()
