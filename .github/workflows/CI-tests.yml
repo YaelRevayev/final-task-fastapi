@@ -18,8 +18,3 @@ jobs:
         - name: Test with unittest
           run: |
             cd tests
-<<<<<<< HEAD
-            python -m unittest
-=======
-            python -m unittest
->>>>>>> d62bd5080021f1425fc0ea8ece9d698fcebfe413
