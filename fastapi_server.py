@@ -1,59 +1,48 @@
 from typing import List
-from logger import configure_error_logger, configure_success_logger, reset_folder
 from fastapi import FastAPI, UploadFile, File
 import hashlib
+from logger import create_loggers
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+import config
 
 app = FastAPI()
-global info_logger
-global error_logger
+
 
 def read_key_from_file(filepath):
     with open(filepath, "rb") as key_file:
         key = key_file.read()
-    if len(key) == 32:
+    if len(key) == config.AES_KEY_LENGTH:
         return key
-    elif len(key) > 32:
-        return key[:32]
+    elif len(key) > config.AES_KEY_LENGTH:
+        return key[: config.AES_KEY_LENGTH]
     else:
-        return key.ljust(32, b'\0')
+        return key.ljust(config.AES_KEY_LENGTH, b"\0")
+
 
 def sign_file(content, key):
     sha512_hash = hashlib.sha512(content).hexdigest()
-    iv = get_random_bytes(16)
+    iv = get_random_bytes(config.IV_BYTES_LENGTH)
     cipher = AES.new(key, AES.MODE_CFB, iv)
     encrypted_hash = cipher.encrypt(sha512_hash.encode())
     return encrypted_hash, iv
 
+
 @app.post("/merge_and_sign")
 async def merge_and_sign(files: List[UploadFile] = File(...)):
     try:
+        merged_files_logger, error_logger = create_loggers()
         content1 = await files[0].read()
         content2 = await files[1].read()
 
         merged_content = content1 + content2
-        key = read_key_from_file("tornado.key")
+        key = read_key_from_file(config.KEY_FILE_NAME)
         encrypted_hash, iv = sign_file(merged_content, key)
 
         merged_filename = files[1].filename.replace("_b", ".jpg")
         with open("merged_files/" + merged_filename, "wb") as f:
-            f.write(merged_content + encrypted_hash + iv)
+            f.write(merged_content + iv + encrypted_hash)
 
-        info_logger.info("Consolidated file saved: %s", merged_filename)
+        merged_files_logger.info("Merged file saved: %s", merged_filename)
     except Exception as e:
         error_logger.error("An error occurred: %s", str(e))
-
-
-def main():
-    reset_folder("logs")
-    reset_folder("merged_files")
-    global info_logger
-    global error_logger
-    info_logger = configure_success_logger()
-    error_logger= configure_error_logger()
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-if __name__ == "__main__":
-    main()

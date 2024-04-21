@@ -1,10 +1,10 @@
 import logging
 import os
 from datetime import datetime
+import config
 import shutil
 
-#reset_folder("logs")
-#reset_folder("mergedf_files")
+
 def reset_folder(directory):
     if os.path.exists(directory):
         shutil.rmtree(directory)
@@ -12,25 +12,32 @@ def reset_folder(directory):
     elif not os.path.exists(directory):
         os.makedirs(directory)
 
-def configure_error_logger():
-    error_logger = logging.getLogger("error_logger")
-    error_logger.setLevel(logging.ERROR)
-    error_handler = logging.FileHandler(os.path.join("logs", "error_fastapi.log"))
-    error_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    error_handler.setFormatter(error_formatter)
-    error_logger.addHandler(error_handler)
-    return error_logger
 
-
-def configure_success_logger():
-    info_logger = logging.getLogger("info_logger")
-    info_logger.setLevel(logging.INFO)
-    info_handler = logging.FileHandler(
-        os.path.join("logs", f"success_fastapi{datetime.now().strftime('%Y-%m-%d')}.log")
-    )       
-    info_formatter = logging.Formatter(
-     "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
+def configure_logger(logger_name, log_file_name):
+    logger = logging.getLogger(logger_name)
+    handler = logging.FileHandler(log_file_name)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
     )
-    info_handler.setFormatter(info_formatter)
-    info_logger.addHandler(info_handler)
-    return info_logger
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
+
+
+def create_loggers():
+    merged_files_logger = configure_logger(
+        "info_logger",
+        os.path.join(
+            config.LOGS_FOLDER_NAME,
+            f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
+        ),
+    )
+    merged_files_logger.setLevel(logging.INFO)
+
+    error_logger = configure_logger(
+        "error_logger",
+        os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
+    )
+    error_logger.setLevel(logging.ERROR)
+
+    return (merged_files_logger, error_logger)
