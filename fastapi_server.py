@@ -41,7 +41,7 @@ async def merge_and_sign(files: List[UploadFile] = File(...)):
 
         merged_filename = files[1].filename.replace("_b", ".jpg")
         with open("merged_files/" + merged_filename, "wb") as f:
-            f.write(merged_content + iv + encrypted_hash)
+            f.write(merged_content + encrypted_hash + iv)
 
         merged_files_logger.info("Merged file saved: %s", merged_filename)
     except Exception as e:
