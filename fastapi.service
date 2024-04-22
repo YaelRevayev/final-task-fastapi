@@ -1,0 +1,12 @@
+[Unit]
+Description=fastapi server for merging files
+After=network.target
+
+[Service]
+Type=simple
+User=${USER}
+WorkingDirectory=${WORKING_DIRECTORY}
+ExecStart=python3 main.py
+
+[Install]
+WantedBy=multi-user.target
