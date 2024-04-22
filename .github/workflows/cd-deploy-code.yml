@@ -16,7 +16,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets["AZURE_VM_HOST_" + matrix.vm_index] }}
-          username: ${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}
+          username: ${{ secrets["AZURE_VM_USERNAME"_ + matrix.vm_index] }}
           password: ${{ secrets["AZURE_VM_PASSWORD_1"] }}
           port: ${{ secrets["AZURE_VM_PORT_1"] }}
           script: |  
