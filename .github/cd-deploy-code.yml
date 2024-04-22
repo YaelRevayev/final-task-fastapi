@@ -1,0 +1,36 @@
+name: cd-deploy-and-run-code-on-vm
+on:
+  workflow_run:
+    workflows: ["ci-test-actions"]
+    branches: [main]
+    types:
+      - completed
+jobs:
+  run-code-on-vm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vm_index: [1, 2]
+    steps:
+      - name: executing remote ssh unzip commands using password
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets["AZURE_VM_HOST_" + matrix.vm_index] }}
+          username: ${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}
+          password: ${{ secrets["AZURE_VM_PASSWORD_1"] }}
+          port: ${{ secrets["AZURE_VM_PORT_1"] }}
+          script: |  
+            if [ -d ${{ github.event.repository.name }} ]; then
+              echo "exists"
+              cd ${{ github.event.repository.name }}
+              git pull
+            else
+              echo "doesnt exist"
+              git clone https://github.com/${{ github.repository }}.git 
+            fi
+            sudo rm -r /etc/systemd/system/fastapi.service
+            sudo cp /home/${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
+            cd /etc/systemd/system/
+            sudo systemctl enable fastapi.service
+            sudo systemctl daemon-reload
+            sudo service fastapi start
