@@ -1,46 +1,54 @@
 name: cd-deploy-and-run-code-on-vm
 on:
   workflow_run:
-    workflows: ["ci-test-actions"]
+    #workflows: ["ci-test-actions"]
     branches: [main]
     types:
       - completed
 jobs:
-  run-code-on-vm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        vm_index: [1, 2]
-    steps:
-      - name: executing remote ssh unzip commands using password
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          AZURE_VM_HOST: ${{ secrets.AZURE_VM_HOST_1 }}, ${{ secrets.AZURE_VM_HOST_2 }}
-          AZURE_VM_USERNAME: ${{ secrets.AZURE_VM_USERNAME_1 }}, ${{ secrets.AZURE_VM_USERNAME_2 }}
-          AZURE_VM_PASSWORD: ${{ secrets.AZURE_VM_PASSWORD_1 }}, ${{ secrets.AZURE_VM_PASSWORD_1 }}
-          AZURE_VM_PORT: ${{ secrets.AZURE_VM_PORT_1 }}, ${{ secrets.AZURE_VM_PORT_1 }}
-        run: |
-          vm_host=${{ env["AZURE_VM_HOST_" + matrix.vm_index] }}
-          vm_username=${{ env["AZURE_VM_USERNAME_" + matrix.vm_index] }}
-          vm_password=${{ env["AZURE_VM_PASSWORD_" + matrix.vm_index] }}
-          vm_port=${{ env["AZURE_VM_PORT_" + matrix.vm_index] }}
-          echo "Host: $vm_host"
-          echo "Username: $vm_username"
-          echo "Password: $vm_password"
-          echo "Port: $vm_port"
-          if [ -d ${{ github.event.repository.name }} ]; then
-            echo "exists"
-            cd ${{ github.event.repository.name }}
-            git pull
-          else
-            echo "doesnt exist"
-            git clone https://github.com/${{ github.repository }}.git 
-          fi
-          sudo rm -r /etc/systemd/system/fastapi.service
-          sudo cp /home/${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
-          sudo sed -i "s|\${USER}|${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}|g" /etc/systemd/system/fastapi.service
-          sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ secrets["AZURE_VM_USERNAME_" + matrix.vm_index] }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
-          cd /etc/systemd/system/
-          sudo systemctl enable fastapi.service
-          sudo systemctl daemon-reload
-          sudo service fastapi start
+        run-code-on-vm:
+          runs-on: ubuntu-latest
+          strategy:
+            matrix:
+              vm_index: [1, 2]
+          steps:
+            - name: Set up environment variables
+              run: |
+                secrets_json='{
+                "AZURE_VM_HOST_1": "'"${{ secrets.AZURE_VM_HOST_1 }}",
+                "AZURE_VM_HOST_2": "'"${{ secrets.AZURE_VM_HOST_2 }}",
+                "AZURE_VM_USERNAME_1": "'"${{ secrets.AZURE_VM_USERNAME_1 }}",
+                "AZURE_VM_USERNAME_2": "'"${{ secrets.AZURE_VM_USERNAME_2 }}"
+                }'
+                secrets=$(echo $secrets_json | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]")
+
+                # Get the values for VM host and username
+                VM_HOST=$(echo $secrets | jq -r ".\"AZURE_VM_HOST_${{ matrix.vm_index }}\"")
+                VM_USERNAME=$(echo $secrets | jq -r ".\"AZURE_VM_USERNAME_${{ matrix.vm_index }}\"")
+    
+                # Set environment variables
+                echo "VM_HOST=$VM_HOST" >> $GITHUB_ENV
+                echo "VM_USERNAME=$VM_USERNAME" >> $GITHUB_ENV
+          
+
+            - name: executing remote ssh unzip commands using password
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+
+                script: |
+                   if [ -d ${{ github.event.repository.name }} ]; then
+                   echo "exists"
+                    cd ${{ github.event.repository.name }}
+                   git pull
+                    else
+                    echo "doesnt exist"
+                    git clone https://github.com/${{ github.repository }}.git 
+                    fi
+                    sudo rm -r /etc/systemd/system/fastapi.service
+                    sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
+                    sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
+                    sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
+                    cd /etc/systemd/system/
+                    sudo systemctl enable fastapi.service
+                    sudo systemctl daemon-reload
+                    sudo service fastapi start
