@@ -1,54 +1,42 @@
-name: cd-deploy-and-run-code-on-vm
+name: deploy-code
+
 on:
-  workflow_run:
-    #workflows: ["ci-test-actions"]
+  push:
     branches: [main]
-    types:
-      - completed
+
 jobs:
-        run-code-on-vm:
-          runs-on: ubuntu-latest
-          strategy:
-            matrix:
-              vm_index: [1, 2]
-          steps:
-            - name: Set up environment variables
-              run: |
-                secrets_json='{
-                "AZURE_VM_HOST_1": "'"${{ secrets.AZURE_VM_HOST_1 }}",
-                "AZURE_VM_HOST_2": "'"${{ secrets.AZURE_VM_HOST_2 }}",
-                "AZURE_VM_USERNAME_1": "'"${{ secrets.AZURE_VM_USERNAME_1 }}",
-                "AZURE_VM_USERNAME_2": "'"${{ secrets.AZURE_VM_USERNAME_2 }}"
-                }'
-                secrets=$(echo $secrets_json | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]")
+  deploy-on-vm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vm_index: [1, 2]
 
-                # Get the values for VM host and username
-                VM_HOST=$(echo $secrets | jq -r ".\"AZURE_VM_HOST_${{ matrix.vm_index }}\"")
-                VM_USERNAME=$(echo $secrets | jq -r ".\"AZURE_VM_USERNAME_${{ matrix.vm_index }}\"")
-    
-                # Set environment variables
-                echo "VM_HOST=$VM_HOST" >> $GITHUB_ENV
-                echo "VM_USERNAME=$VM_USERNAME" >> $GITHUB_ENV
-          
+    steps:
+      - name: Set up environment variables
+        run: |
+          echo "VM_HOST=${{ secrets[format('AZURE_VM_HOST_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ secrets[format('AZURE_VM_USERNAME_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ secrets.AZURE_VM_PASSWORD_1 }}" >> $GITHUB_ENV
+          echo "VM_PORT=${{ secrets.AZURE_VM_PORT_1 }}" >> $GITHUB_ENV
 
-            - name: executing remote ssh unzip commands using password
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-
-                script: |
-                   if [ -d ${{ github.event.repository.name }} ]; then
-                   echo "exists"
-                    cd ${{ github.event.repository.name }}
-                   git pull
-                    else
-                    echo "doesnt exist"
-                    git clone https://github.com/${{ github.repository }}.git 
-                    fi
-                    sudo rm -r /etc/systemd/system/fastapi.service
-                    sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
-                    sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
-                    sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
-                    cd /etc/systemd/system/
-                    sudo systemctl enable fastapi.service
-                    sudo systemctl daemon-reload
-                    sudo service fastapi start
+      - name: Execute commands on VM
+        uses: appleboy/ssh-action@v1
+        with:
+          username: ${{ env.VM_USERNAME }}
+          script: |
+            if [ -d ${{ github.event.repository.name }} ]; then
+              echo "exists"
+              cd ${{ github.event.repository.name }}
+              git pull
+            else
+              echo "doesnt exist"
+              git clone https://github.com/${{ github.repository }}.git 
+            fi
+            sudo rm -r /etc/systemd/system/fastapi.service
+            sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
+            sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
+            sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
+            cd /etc/systemd/system/
+            sudo systemctl enable fastapi.service
+            sudo systemctl daemon-reload
+            sudo service fastapi start
