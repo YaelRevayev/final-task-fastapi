@@ -20,7 +20,7 @@ jobs:
           echo "VM_PORT=${{ secrets.AZURE_VM_PORT_1 }}" >> $GITHUB_ENV
 
       - name: Execute commands on VM
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.0.3
         with:
           username: ${{ env.VM_USERNAME }}
           script: |
