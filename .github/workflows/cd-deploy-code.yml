@@ -16,8 +16,8 @@ jobs:
         run: |
           echo "VM_HOST=${{ secrets[format('AZURE_VM_HOST_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
           echo "VM_USERNAME=${{ secrets[format('AZURE_VM_USERNAME_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ secrets.AZURE_VM_PASSWORD_1 }}" >> $GITHUB_ENV
-          echo "VM_PORT=${{ secrets.AZURE_VM_PORT_1 }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ secrets[format('AZURE_VM_PASSWORD_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
+          echo "VM_PORT=${{ secrets[format('AZURE_VM_PORT_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
 
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
