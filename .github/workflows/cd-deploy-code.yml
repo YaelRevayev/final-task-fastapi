@@ -22,7 +22,10 @@ jobs:
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
+          host: ${{ env.VM_HOST }}
           username: ${{ env.VM_USERNAME }}
+          password: ${{ env.VM_PASSWORD }}
+          port: ${{ env.VM_PORT }}
           script: |
             if [ -d ${{ github.event.repository.name }} ]; then
               echo "exists"
