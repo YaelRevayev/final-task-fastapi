@@ -43,11 +43,7 @@ jobs:
             cd ${WORKING_DIRECTORY}/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}
             sudo apt update
             sudo apt install -y python3 python3-pip
-            pip install fastapi
-            pip install uvicorn
-            pip install python-multipart
-            pip3 install pycryptodome
-            pip3 install -r requirements.txt
+            pip install -r requirements.txt
             cd /etc/systemd/system/
             sudo systemctl enable fastapi.service
             sudo systemctl daemon-reload
