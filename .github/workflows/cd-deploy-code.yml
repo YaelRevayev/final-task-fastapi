@@ -41,7 +41,9 @@ jobs:
             sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
             sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
             cd ${WORKING_DIRECTORY}/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}
-            pip install -r requirements.txt
+            sudo apt update
+            sudo apt install -y python3 python3-pip
+            pip3 install -r requirements.txt
             cd /etc/systemd/system/
             sudo systemctl enable fastapi.service
             sudo systemctl daemon-reload
