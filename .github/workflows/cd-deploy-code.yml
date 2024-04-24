@@ -1,8 +1,11 @@
 name: deploy-code
 
 on:
-  push:
+  workflow_run:
+    workflows: ["ci-test-actions"]
     branches: [main]
+    types: 
+      - completed
 
 jobs:
   deploy-on-vm:
