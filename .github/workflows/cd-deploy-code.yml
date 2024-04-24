@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Set up environment variables
         run: |
+          echo ${{ secrets.AZURE_VM_PORT_1 }}
           echo "VM_HOST=${{ secrets[format('AZURE_VM_HOST_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
           echo "VM_USERNAME=${{ secrets[format('AZURE_VM_USERNAME_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
           echo "VM_PASSWORD=${{ secrets[format('AZURE_VM_PASSWORD_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
