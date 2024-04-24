@@ -40,3 +40,4 @@ jobs:
             sudo systemctl enable fastapi.service
             sudo systemctl daemon-reload
             sudo service fastapi start
+
