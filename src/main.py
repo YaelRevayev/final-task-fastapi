@@ -1,5 +1,4 @@
-from fastapi_server import app
-from logger import create_loggers
+from src.fastapi_server import app
 import uvicorn
 
 

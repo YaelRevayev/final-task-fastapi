@@ -5,20 +5,67 @@ import os
 import sys
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+src_dir = os.path.join(project_dir, "src")
 sys.path.append(project_dir)
-from fastapi_server import app
-import config
+sys.path.insert(0, src_dir)
+from src.fastapi_server import app, part_a_or_b, list_files_in_order
+
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+src_dir = os.path.join(project_dir, "configs")
+sys.path.append(project_dir)
+sys.path.insert(0, src_dir)
+import configs.config as config
 
 
 class TestAPI(unittest.TestCase):
-
     def setUp(self):
         self.client = TestClient(app)
 
+    def test_part_a_or_b_given_part_a_returns_a(self):
+        filename_a = "file_a.txt"
+        result_a = part_a_or_b(filename_a)
+        self.assertEqual(result_a, "a")
+
+    def test_part_a_or_b_given_part_b_returns_b(self):
+        filename_b = "file_b.txt"
+        result_b = part_a_or_b(filename_b)
+        self.assertEqual(result_b, "b")
+
+    def test_part_a_or_b_given_invalid_name_returns_none(self):
+        filename_invalid = "file_invalid.txt"
+        result_invalid = part_a_or_b(filename_invalid)
+        self.assertIsNone(result_invalid)
+
+    async def test_list_files_in_order_given_right_order_returns_same_order(self):
+        files = [
+            MagicMock(filename="file_a.txt", read=MagicMock(return_value=b"content_a")),
+            MagicMock(filename="file_b.txt", read=MagicMock(return_value=b"content_b")),
+        ]
+
+        result = await list_files_in_order(files)
+
+        expected_result = (b"content_a", b"content_b")
+        self.assertEqual(result, expected_result)
+
+    async def test_list_files_in_order_given_wrong_order_returns_opposite_order(self):
+        files = [
+            MagicMock(filename="file_b.txt", read=MagicMock(return_value=b"content_b")),
+            MagicMock(filename="file_a.txt", read=MagicMock(return_value=b"content_a")),
+        ]
+
+        result = await list_files_in_order(files)
+
+        expected_result = (b"content_a", b"content_b")
+        self.assertEqual(result, expected_result)
+
     def test_merge_and_sign(self):
         with patch("fastapi_server.create_loggers") as mock_create_loggers:
-            mock_logger = MagicMock()
-            mock_create_loggers.return_value = (mock_logger, mock_logger)
+            mock_merged_files_logger = MagicMock()
+            mock_error_logger = MagicMock()
+            mock_create_loggers.return_value = (
+                mock_merged_files_logger,
+                mock_error_logger,
+            )
 
             files = []
             files.append(("files", ("test100_a.jpg", b"test_data1")))
@@ -29,7 +76,8 @@ class TestAPI(unittest.TestCase):
             )
 
             self.assertEqual(response.status_code, 200)
-            mock_logger.info.assert_called_once_with(
+
+            mock_merged_files_logger.info.assert_called_once_with(
                 "Merged file saved: %s", "test100.jpg"
             )
 
