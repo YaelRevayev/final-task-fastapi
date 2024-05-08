@@ -2,19 +2,16 @@ from typing import List
 from fastapi import FastAPI, UploadFile, File
 import os
 import sys
+import logging
+import datetime
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-src_dir = os.path.join(project_dir, "configs")
-sys.path.append(project_dir)
-sys.path.insert(0, src_dir)
-import configs.config as config
+sys.path.append(os.path.join(project_dir, "configs"))
+sys.path.insert(0, os.path.join(project_dir, "src"))
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-src_dir = os.path.join(project_dir, "src")
-sys.path.append(project_dir)
-sys.path.insert(0, src_dir)
-from src.logger import create_loggers
-from src.encryption import read_key_from_file, sign_file
+import config
+from encryption import read_key_from_file, sign_file
+from logger import configure_logger
 
 
 app = FastAPI()
@@ -48,7 +45,20 @@ async def list_files_in_order(files):
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
-        merged_files_logger, error_logger = create_loggers()
+        merged_files_logger = configure_logger(
+            "merged_files_logger_logger",
+            os.path.join(
+                config.LOGS_FOLDER_NAME,
+                f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
+            ),
+            logging.INFO,
+        )
+
+        error_logger = configure_logger(
+            "error_fastapi_logger",
+            os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
+            logging.ERROR,
+        )
 
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
