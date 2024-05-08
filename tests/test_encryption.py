@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 import os
 import sys
-from Crypto.Cipher import AES
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.append(project_dir)
