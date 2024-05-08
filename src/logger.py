@@ -4,10 +4,9 @@ from datetime import datetime
 import sys
 import shutil
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-src_dir = os.path.join(project_dir, "configs")
-sys.path.append(project_dir)
-sys.path.insert(0, src_dir)
+from utils import setup_project_directories
+
+setup_project_directories("configs")
 import configs.config as config
 
 
@@ -32,7 +31,7 @@ def configure_logger(logger_name, log_file_name):
 
 def create_loggers():
     merged_files_logger = configure_logger(
-        "info_logger",
+        "merged_files_logger_logger",
         os.path.join(
             config.LOGS_FOLDER_NAME,
             f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
@@ -41,7 +40,7 @@ def create_loggers():
     merged_files_logger.setLevel(logging.INFO)
 
     error_logger = configure_logger(
-        "error_logger",
+        "error_fastapi_logger",
         os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
     )
     error_logger.setLevel(logging.ERROR)

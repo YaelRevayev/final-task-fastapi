@@ -1,15 +1,11 @@
 from typing import List
 from fastapi import FastAPI, UploadFile, File
-from src.logger import create_loggers
-import os
-import sys
 from encryption import read_key_from_file, sign_file
+from utils import setup_project_directories
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-src_dir = os.path.join(project_dir, "configs")
-sys.path.append(project_dir)
-sys.path.insert(0, src_dir)
+setup_project_directories("configs")
 import configs.config as config
+from src.logger import create_loggers
 
 
 app = FastAPI()
