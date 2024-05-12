@@ -6,6 +6,18 @@ on:
     branches: [main]
     types: 
       - completed
+  workflow_dispatch:
+    inputs:
+      vms:
+        description: 'List of VM configurations'
+        required: true
+        default: |
+          - host: vm1-host
+            username: vm1-username
+            password: vm1-password
+          - host: vm2-host
+            username: vm2-username
+            password: vm2-password
 
 jobs:
   deploy-on-vm:
@@ -17,11 +29,11 @@ jobs:
     steps:
       - name: Set up environment variables
         run: |
-          echo ${{ secrets.AZURE_VM_PORT1 }}
-          echo "VM_HOST=${{ secrets[format('AZURE_VM_HOST{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ secrets[format('AZURE_VM_USERNAME_{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ secrets[format('AZURE_VM_PASSWORD{0}', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_PORT=${{ secrets.AZURE_VM_PORT }}" >> $GITHUB_ENV
+          echo "${{ toJson(inputs.vms[0].username) }}"
+          echo "VM_HOST=${{ format('fromJson(inputs.vms[{0}].host)', matrix.vm_index) }}" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ format(fromJson(inputs.vms[{0}].username), matrix.vm_index) }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ format(fromJson(inputs.vms[{0}].password), matrix.vm_index) }}" >> $GITHUB_ENV
+          echo "VM_PORT=22" >> $GITHUB_ENV
 
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
