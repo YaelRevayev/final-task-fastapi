@@ -19,20 +19,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vm_index: [1, 2]
+        vm_index: 
+            - ${{ join(fromJson(inputs.vms.*.host), ',') }}
 
     steps:
       - name: Set up environment variables
         run: |
-          echo "INPUT_VMS='${{ toJson(github.event.inputs.vms) }}'" >> $GITHUB_ENV
-          echo "${{ env.INPUTS_VMS}}"
+          index=$(echo "${{ matrix.vm_index }}" | tr -d '[:alpha:]')
+          echo "VM_HOST=$index" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ fromJson(inputs.vms[$index-1].username) }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ fromJson(inputs.vms[$index-1].password) }}" >> $GITHUB_ENV
+
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.VM_HOST }}
           username: ${{ env.VM_USERNAME }}
           password: ${{ env.VM_PASSWORD }}
-          port: ${{ env.VM_PORT }}
+          port: 22
           script: |
             if [ -d ${{ github.event.repository.name }} ]; then
               echo "exists"
