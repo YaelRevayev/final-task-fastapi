@@ -16,6 +16,21 @@ from logger import configure_logger
 
 app = FastAPI()
 
+merged_files_logger = configure_logger(
+    "merged_files_logger_logger",
+    os.path.join(
+        config.LOGS_FOLDER_NAME,
+        f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
+    ),
+    logging.INFO,
+)
+
+error_logger = configure_logger(
+    "error_fastapi_logger",
+    os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
+    logging.ERROR,
+)
+
 
 def part_a_or_b(filename):
     index_of_underscore = filename.find("_")
@@ -45,20 +60,6 @@ async def list_files_in_order(files):
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
-        merged_files_logger = configure_logger(
-            "merged_files_logger_logger",
-            os.path.join(
-                config.LOGS_FOLDER_NAME,
-                f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
-            ),
-            logging.INFO,
-        )
-
-        error_logger = configure_logger(
-            "error_fastapi_logger",
-            os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
-            logging.ERROR,
-        )
 
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
