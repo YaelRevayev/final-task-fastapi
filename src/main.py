@@ -1,4 +1,4 @@
-from src.fastapi_server import app
+from fastapi_server import app
 import uvicorn
 
 
