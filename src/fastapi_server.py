@@ -63,7 +63,8 @@ async def merge_files(files: List[UploadFile] = File(...)):
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
 
-        key = read_key_from_file(config.KEY_FILE_NAME)
+        # key = read_key_from_file(config.KEY_FILE_NAME)
+        key = "12345678901234567890123456789012"
         encrypted_hash, iv = sign_file(merged_content, key)
 
         merged_filename = files[1].filename.replace("_b", ".jpg")
