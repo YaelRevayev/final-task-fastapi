@@ -31,10 +31,9 @@ async def list_files_in_order(files):
 
     for file in files:
         file_content = await file.read()
-        part = part_a_or_b(file.filename)
-        if part == "a":
+        if file.filename.endswith("_a.jpg"):
             part_a = file_content
-        elif part == "b":
+        elif file.filename.endswith("_b"):
             part_b = file_content
     return (part_a, part_b)
 
