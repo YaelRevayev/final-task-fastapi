@@ -18,7 +18,7 @@ app = FastAPI()
 
 merged_files_logger = configure_logger(
     "merged_files_logger_logger",
-    os.path.join(
+    "{0}/{1}".format(
         config.LOGS_FOLDER_NAME,
         f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
     ),
@@ -27,7 +27,7 @@ merged_files_logger = configure_logger(
 
 error_logger = configure_logger(
     "error_fastapi_logger",
-    os.path.join(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
+    "{0}/{1}".format(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
     logging.ERROR,
 )
 
