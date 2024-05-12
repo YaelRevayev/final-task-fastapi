@@ -41,12 +41,11 @@ async def list_files_in_order(files):
 
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
-    try:
-        from logger import merged_files_logger, error_logger
+    from logger import merged_files_logger, error_logger
 
+    try:
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
-
         # key = read_key_from_file(config.KEY_FILE_NAME)
         key = secrets.token_bytes(32)
         encrypted_hash, iv = sign_file(merged_content, key)
