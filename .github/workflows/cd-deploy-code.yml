@@ -26,9 +26,10 @@ jobs:
       - name: Set up environment variables
         run: |
           index=$(echo "${{ matrix.vm_index }}" | tr -d '[:alpha:]')
+          vm_index=$((index - 1))
           echo "VM_HOST=$index" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ fromJson(inputs.vms[$index-1].username) }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ fromJson(inputs.vms[$index-1].password) }}" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ fromJson(inputs.vms[vm_index].username) }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ fromJson(inputs.vms[vm_index].password) }}" >> $GITHUB_ENV
 
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
