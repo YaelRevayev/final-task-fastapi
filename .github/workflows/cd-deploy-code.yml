@@ -30,9 +30,9 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "${{ toJson(inputs.vms[0].username) }}"
-          echo "VM_HOST=${{ format('fromJson(inputs.vms[{0}].host)', matrix.vm_index) }}" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ format(fromJson(inputs.vms[{0}].username), matrix.vm_index) }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ format(fromJson(inputs.vms[{0}].password), matrix.vm_index) }}" >> $GITHUB_ENV
+          echo "VM_HOST=${{ fromJson(inputs.vms[matrix.vm_index - 1].host) }}" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ fromJson(inputs.vms[matrix.vm_index - 1].username) }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ fromJson(inputs.vms[matrix.vm_index - 1].password) }}" >> $GITHUB_ENV
           echo "VM_PORT=22" >> $GITHUB_ENV
 
       - name: Execute commands on VM
@@ -63,4 +63,3 @@ jobs:
             sudo systemctl enable fastapi.service
             sudo systemctl daemon-reload
             sudo service fastapi start
-
