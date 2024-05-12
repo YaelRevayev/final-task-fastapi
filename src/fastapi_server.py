@@ -50,7 +50,11 @@ async def merge_files(files: List[UploadFile] = File(...)):
         key = secrets.token_bytes(32)
         encrypted_hash, iv = sign_file(merged_content, key)
 
-        merged_filename = files[1].filename[:-6] + ".jpg"
+        filename = files[1].filename
+        if filename.endswith("_a.jpg"):
+            merged_filename = filename[:-6] + ".jpg"
+        elif filename.endswith("_b"):
+            merged_filename = filename[:-2] + ".jpg"
         print(merged_filename)
         with open(
             "/{0}/merged_files/{1}".format(project_dir, merged_filename), "wb"
