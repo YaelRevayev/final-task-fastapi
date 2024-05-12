@@ -14,35 +14,28 @@ on:
             username: vm2-username
             password: vm2-password
 
-jobs:
-  set-up-vars:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        vm_index: [0, 1]
-    steps:
-      - name: Set up environment variables
-        run: |
-          VM_CONFIG=$(echo "${{fromJson(inputs.vms)}}" | jq -r ".[${{ matrix.vm_index }}]")
-          VM_HOST=$(echo "$VM_CONFIG" | jq -r '.host')
-          VM_USERNAME=$(echo "$VM_CONFIG" | jq -r '.username')
-          VM_PASSWORD=$(echo "$VM_CONFIG" | jq -r '.password')
-          echo "VM_HOST=$VM_HOST" >> $GITHUB_ENV
-          echo "VM_USERNAME=$VM_USERNAME" >> $GITHUB_ENV
-          echo "VM_PASSWORD=$VM_PASSWORD" >> $GITHUB_ENV
+env:
+  VM_HOST_1: ${{fromJson(inputs.vms[0].host)}}
+  VM_USERNAME_1: ${{fromJson(inputs.vms[0].username)}}
+  VM_PASSWORD_1: ${{fromJson(inputs.vms[0].password)}}
+  VM_HOST_2: ${{fromJson(inputs.vms[1].host)}}
+  VM_USERNAME_2: ${{fromJson(inputs.vms[1].username)}}
+  VM_PASSWORD_2: ${{fromJson(inputs.vms[1].password)}}
 
+jobs:
   deploy-on-vm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vm_index: [0, 1]
+        vm_index: [1, 2]
+
     steps:
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env.VM_HOST }}
-          username: ${{ env.VM_USERNAME }}
-          password: ${{ env.VM_PASSWORD }}
+          host: ${{ env['VM_HOST_' + matrix.vm_index] }}
+          username: ${{ env['VM_USERNAME_' + matrix.vm_index] }}
+          password: ${{ env['VM_PASSWORD_' + matrix.vm_index] }}
           port: 22
           script: |
             if [ -d ${{ github.event.repository.name }} ]; then
