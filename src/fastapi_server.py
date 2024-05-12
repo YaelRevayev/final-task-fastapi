@@ -16,18 +16,17 @@ from logger import configure_logger
 
 app = FastAPI()
 
+root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+logs_folder_path = os.path.join(root_path, "logs")
 merged_files_logger = configure_logger(
     "merged_files_logger_logger",
-    "{0}/{1}".format(
-        config.LOGS_FOLDER_NAME,
-        f"success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
-    ),
+    f"{logs_folder_path}/success_file_merging{datetime.now().strftime('%Y-%m-%d')}.log",
     logging.INFO,
 )
 
 error_logger = configure_logger(
     "error_fastapi_logger",
-    "{0}/{1}".format(config.LOGS_FOLDER_NAME, "error_fastapi.log"),
+    f"{logs_folder_path}/error_fastapi.log",
     logging.ERROR,
 )
 
