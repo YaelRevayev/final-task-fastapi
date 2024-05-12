@@ -25,11 +25,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "INPUT_VMS='${{ toJson(github.event.inputs.vms) }}'" >> $GITHUB_ENV
-          echo "VM_HOST=${{ fromJson(inputs.vms[matrix.vm_index - 1].host) }}" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ fromJson(inputs.vms[matrix.vm_index - 1].username) }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ fromJson(inputs.vms[matrix.vm_index - 1].password) }}" >> $GITHUB_ENV
-          echo "VM_PORT=22" >> $GITHUB_ENV
-
+          echo "${{ env.INPUTS_VMS}}"
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
