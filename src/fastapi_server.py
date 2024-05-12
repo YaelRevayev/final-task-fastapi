@@ -3,6 +3,7 @@ from fastapi import FastAPI, UploadFile, File
 import os
 import sys
 import logging
+import secrets
 from datetime import datetime
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -64,7 +65,7 @@ async def merge_files(files: List[UploadFile] = File(...)):
         merged_content = part_a + part_b
 
         # key = read_key_from_file(config.KEY_FILE_NAME)
-        key = "12345678901234567890123456789012"
+        key = secrets.token_bytes(32)
         encrypted_hash, iv = sign_file(merged_content, key)
 
         merged_filename = files[1].filename.replace("_b", ".jpg")
