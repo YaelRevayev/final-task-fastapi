@@ -2,8 +2,8 @@
 _pyache/
 
 # Ignore output files
-#/merged_files/*
+/merged_files/*
 
 # Ignore log files
-#/logs/*
+/logs/*
 
