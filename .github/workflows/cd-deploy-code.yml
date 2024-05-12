@@ -15,15 +15,26 @@ on:
             password: vm2-password
 
 jobs:
+  set-up-vars:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vm_index: [1, 2]
+    steps:
+      - name: Set up environment variables
+        run: |
+          VM_CONFIG=$(echo "${{fromJson(inputs.vms)}}" | jq -r ".[${{ matrix.vm_index - 1 }}]")
+          VM_HOST=$(echo "$VM_CONFIG" | jq -r '.host')
+          VM_USERNAME=$(echo "$VM_CONFIG" | jq -r '.username')
+          VM_PASSWORD=$(echo "$VM_CONFIG" | jq -r '.password')
+          echo "VM_HOST=$VM_HOST" >> $GITHUB_ENV
+          echo "VM_USERNAME=$VM_USERNAME" >> $GITHUB_ENV
+          echo "VM_PASSWORD=$VM_PASSWORD" >> $GITHUB_ENV
   deploy-on-vm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         vm_index: [1, 2]
-    env:
-      VM_HOST: ${{fromJson(needs.setup-env.outputs.env.${{ matrix.vm_index }}.host)}}
-      VM_USERNAME: ${{fromJson(needs.setup-env.outputs.env.${{ matrix.vm_index }}.username)}}
-      VM_PASSWORD: ${{fromJson(needs.setup-env.outputs.env.${{ matrix.vm_index }}.password)}}
     steps:
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
