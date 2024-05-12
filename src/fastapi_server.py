@@ -52,7 +52,7 @@ async def merge_files(files: List[UploadFile] = File(...)):
         encrypted_hash, iv = sign_file(merged_content, key)
 
         merged_filename = files[1].filename.replace("_b", ".jpg")
-        with open("../merged_files/" + merged_filename, "wb") as f:
+        with open("/merged_files/" + merged_filename, "wb") as f:
             f.write(merged_content + iv + encrypted_hash)
 
         merged_files_logger.info("Merged file saved: %s", merged_filename)
