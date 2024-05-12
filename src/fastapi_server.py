@@ -9,11 +9,7 @@ from datetime import datetime
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.append(os.path.join(project_dir, "configs"))
 sys.path.insert(0, os.path.join(project_dir, "src"))
-
 from encryption import read_key_from_file, sign_file
-from logger import configure_logger
-
-from logger import merged_files_logger, error_logger
 
 app = FastAPI()
 
@@ -46,6 +42,7 @@ async def list_files_in_order(files):
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
+        from logger import merged_files_logger, error_logger
 
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
