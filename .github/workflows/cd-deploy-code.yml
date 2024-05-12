@@ -33,9 +33,9 @@ jobs:
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env['VM_HOST_' + matrix.vm_index] }}
-          username: ${{ env['VM_USERNAME_' + matrix.vm_index] }}
-          password: ${{ env['VM_PASSWORD_' + matrix.vm_index] }}
+          host: ${{ env[format('VM_HOST_{0}', matrix.vm_index)] }}
+          username: ${{ env[format('VM_USERNAME_{0}', matrix.vm_index)] }}
+          password: ${{ env[format('VM_PASSWORD_{0}', matrix.vm_index)] }}
           port: 22
           script: |
             if [ -d ${{ github.event.repository.name }} ]; then
