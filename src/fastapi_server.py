@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, File
 import os
 import sys
 import logging
-import datetime
+from datetime import datetime
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.append(os.path.join(project_dir, "configs"))
