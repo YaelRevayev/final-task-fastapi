@@ -6,14 +6,10 @@ import logging
 import secrets
 from datetime import datetime
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-sys.path.append(os.path.join(project_dir, "configs"))
-sys.path.insert(0, os.path.join(project_dir, "src"))
-
-import config
 from encryption import read_key_from_file, sign_file
 from logger import configure_logger
 
+os.makedirs("logs", exist_ok=True)
 
 app = FastAPI()
 
