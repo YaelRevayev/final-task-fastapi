@@ -49,16 +49,15 @@ jobs:
             else
               echo "doesnt exist"
               git clone https://github.com/${{ github.repository }}.git 
+              sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
+              sudo apt update
+              sudo apt install -y python3 python3-pip
+              pip install -r requirements.txt
+              cd /etc/systemd/system/
+              sudo systemctl enable fastapi.service
             fi
-            sudo rm -r /etc/systemd/system/fastapi.service
-            sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/fastapi.service /etc/systemd/system/ 
             sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
             sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
             cd ${WORKING_DIRECTORY}/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}
-            sudo apt update
-            sudo apt install -y python3 python3-pip
-            pip install -r requirements.txt
-            cd /etc/systemd/system/
-            sudo systemctl enable fastapi.service
             sudo systemctl daemon-reload
-            sudo service fastapi start
+            sudo service fastapi restart
