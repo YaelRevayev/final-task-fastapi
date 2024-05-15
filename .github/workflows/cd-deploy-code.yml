@@ -35,7 +35,7 @@ jobs:
             echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
             echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
       - name: Execute commands on VM
-        uses: appleboy/ssh-action@v0.1.2
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.VM_HOST }}
           username: ${{ env.VM_USERNAME }}
