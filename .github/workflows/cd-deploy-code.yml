@@ -27,39 +27,38 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vm_index: [1, 2]
+        vm: [1, 2]
     steps:
       - name: Set up environment variables
         run: |
-          echo "VM_HOST=${{ github.event.inputs[format('vm{0}-host', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
+          echo "VM_HOST=${{ github.event.inputs['vm' + matrix.vm + '-host'] }}" >> $GITHUB_ENV
+          echo "VM_USERNAME=${{ github.event.inputs['vm' + matrix.vm + '-username'] }}" >> $GITHUB_ENV
+          echo "VM_PASSWORD=${{ github.event.inputs['vm' + matrix.vm + '-password'] }}" >> $GITHUB_ENV
+
       - name: Execute commands on VM
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ env.VM_HOST }}
           username: ${{ env.VM_USERNAME }}
           password: ${{ env.VM_PASSWORD }}
           port: 22
           script: |
-            if [ -d ${{ github.event.repository.name }} ]; then
-              echo "exists"
-              cd ${{ github.event.repository.name }}
+            REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
+            if [ -d "$REPO_DIR" ]; then
+              echo "Repository exists"
+              cd "$REPO_DIR"
               git pull
             else
-              echo "doesnt exists"
-              git clone https://github.com/${{ github.repository }}.git 
-              chmod +x /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/dependencies/install_packages.sh
-              ./install_packages.sh
-              sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/configs/fastapi.service /etc/systemd/system/ 
-              sudo apt update
-              sudo apt install -y python3 python3-pip
-              cd /etc/systemd/system/
+              echo "Repository does not exist"
+              git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
+              chmod +x "$REPO_DIR/dependencies/install_packages.sh"
+              "$REPO_DIR/dependencies/install_packages.sh"
+              sudo cp "$REPO_DIR/configs/fastapi.service" /etc/systemd/system/
               sudo systemctl enable fastapi.service
             fi
             sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
-            sudo sed -i "s|\${WORKING_DIRECTORY}|/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}|g" /etc/systemd/system/fastapi.service
-            cd ${WORKING_DIRECTORY}/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}
+            sudo sed -i "s|\${WORKING_DIRECTORY}|$REPO_DIR|g" /etc/systemd/system/fastapi.service
+            cd "$REPO_DIR"
             pip install -r requirements.txt
             sudo systemctl daemon-reload
-            sudo service fastapi restart
+            sudo systemctl restart fastapi
