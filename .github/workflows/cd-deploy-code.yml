@@ -31,10 +31,9 @@ jobs:
     steps:
       - name: Set up environment variables
         run: |
-          echo "VM_HOST=${{ github.event.inputs['vm' + matrix.vm + '-host'] }}" >> $GITHUB_ENV
-          echo "VM_USERNAME=${{ github.event.inputs['vm' + matrix.vm + '-username'] }}" >> $GITHUB_ENV
-          echo "VM_PASSWORD=${{ github.event.inputs['vm' + matrix.vm + '-password'] }}" >> $GITHUB_ENV
-
+            echo "VM_HOST=${{ github.event.inputs[format('vm{0}-host', matrix.vm_index)] }}" >> $GITHUB_ENV
+            echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
+            echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
       - name: Execute commands on VM
         uses: appleboy/ssh-action@v0.1.2
         with:
