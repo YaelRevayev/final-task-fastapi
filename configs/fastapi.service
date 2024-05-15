@@ -4,7 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-User=${USER}
 WorkingDirectory=${WORKING_DIRECTORY}
 ExecStart=/usr/bin/python3 ./src/main.py
 
