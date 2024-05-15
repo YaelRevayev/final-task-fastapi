@@ -50,10 +50,10 @@ jobs:
               git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
               chmod +x "$REPO_DIR/dependencies/install_packages.sh"
               "$REPO_DIR/dependencies/install_packages.sh"
-              sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
-              sudo systemctl start filebeat
-              sudo systemctl enable filebeat
             fi
+            sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
+            sudo systemctl start filebeat
+            sudo systemctl enable filebeat
             sudo cp "$REPO_DIR/configs/fastapi.service" /etc/systemd/system/
             sudo systemctl enable fastapi.service
             sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
