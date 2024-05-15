@@ -47,8 +47,10 @@ jobs:
               cd ${{ github.event.repository.name }}
               git pull
             else
-              echo "doesnt exist"
+              echo "doesnt exists"
               git clone https://github.com/${{ github.repository }}.git 
+              chmod +x /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/dependencies/install_packages.sh
+              ./install_packages.sh
               sudo cp /home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}/configs/fastapi.service /etc/systemd/system/ 
               sudo apt update
               sudo apt install -y python3 python3-pip
