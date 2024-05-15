@@ -49,7 +49,7 @@ jobs:
               echo "Repository does not exist"
               git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
               chmod +x "$REPO_DIR/dependencies/install_packages.sh"
-              "$REPO_DIR/dependencies/install_packages.sh"
+              ./$REPO_DIR/dependencies/install_packages.sh
             fi
             sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
             sudo systemctl start filebeat
