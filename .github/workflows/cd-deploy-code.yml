@@ -1,47 +1,45 @@
 name: deploy-code
-
 on:
-  workflow_dispatch:
-    inputs:
-      vm1-host:
-        description: 'Host for VM 1'
-        required: true
-      vm1-username:
-        description: 'Username for VM 1'
-        required: true
-      vm1-password:
-        description: 'Password for VM 1'
-        required: true
-      vm2-host:
-        description: 'Host for VM 2'
-        required: true
-      vm2-username:
-        description: 'Username for VM 2'
-        required: true
-      vm2-password:
-        description: 'Password for VM 2'
-        required: true
-
+ workflow_dispatch:
+   inputs:
+     vm1-host:
+       description: 'Host for VM 1'
+       required: true
+     vm1-username:
+       description: 'Username for VM 1'
+       required: true
+     vm1-password:
+       description: 'Password for VM 1'
+       required: true
+     vm2-host:
+       description: 'Host for VM 2'
+       required: true
+     vm2-username:
+       description: 'Username for VM 2'
+       required: true
+     vm2-password:
+       description: 'Password for VM 2'
+       required: true
 jobs:
-  deploy-on-vm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        vm: [1, 2]
-    steps:
-      - name: Set up environment variables
-        run: |
-            echo "VM_HOST=${{ github.event.inputs[format('vm{0}-host', matrix.vm_index)] }}" >> $GITHUB_ENV
-            echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
-            echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
-      - name: Execute commands on VM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ env.VM_HOST }}
-          username: ${{ env.VM_USERNAME }}
-          password: ${{ env.VM_PASSWORD }}
-          port: 22
-          script: |
+ deploy-on-vm:
+   runs-on: ubuntu-latest
+   strategy:
+     matrix:
+       vm_index: [1, 2]
+   steps:
+     - name: Set up environment variables
+       run: |
+         echo "VM_HOST=${{ github.event.inputs[format('vm{0}-host', matrix.vm_index)] }}" >> $GITHUB_ENV
+         echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
+         echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
+     - name: Execute commands on VM
+       uses: appleboy/ssh-action@v1.0.3
+       with:
+         host: ${{ env.VM_HOST }}
+         username: ${{ env.VM_USERNAME }}
+         password: ${{ env.VM_PASSWORD }}
+         port: 22
+         script: |
             REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
             if [ -d "$REPO_DIR" ]; then
               echo "Repository exists"
