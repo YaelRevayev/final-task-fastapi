@@ -44,7 +44,8 @@ jobs:
             if [ -d "$REPO_DIR" ]; then
               echo "Repository exists"
               cd "$REPO_DIR"
-              git pull --force
+              git reset --hard HEAD
+              git pull
             else
               echo "Repository does not exist"
               git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
