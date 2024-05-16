@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, File
 from datetime import datetime
 import os
 from encryption import read_key_from_file, sign_file
-import configs.config as config
+import configs as config
 from logger import fastapi_logger
 
 app = FastAPI()
@@ -35,12 +35,15 @@ async def list_files_in_order(files):
 
 def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
     project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    
     if filename.endswith("_a.jpg"):
         merged_filename = filename[:-6] + ".jpg"
     elif filename.endswith("_b"):
         merged_filename = filename[:-2] + ".jpg"
+
     with open("/{0}/merged_files/{1}".format(project_dir, merged_filename), "wb") as f:
         f.write(merged_content + iv + encrypted_hash)
+
     fastapi_logger.info("Merged file saved: %s", merged_filename)
 
 
