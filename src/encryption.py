@@ -1,13 +1,7 @@
-import sys
-import os
 import hashlib
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-src_dir = os.path.join(project_dir, "configs")
-sys.path.append(project_dir)
-sys.path.insert(0, src_dir)
 import configs as config
 
 
