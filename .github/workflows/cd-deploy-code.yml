@@ -20,6 +20,15 @@ on:
      vm2-password:
        description: 'Password for VM 2'
        required: true
+     vm3-host:
+       description: 'Host for VM 2'
+       required: true
+     vm3-username:
+       description: 'Username for VM 2'
+       required: true
+     vm3-password:
+       description: 'Password for VM 2'
+       required: true
 jobs:
  deploy-on-vm:
    runs-on: ubuntu-latest
