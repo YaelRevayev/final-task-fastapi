@@ -16,5 +16,5 @@ jobs:
              pip install -r dependencies/requirements.txt
         - name: Test with unittest
           run: |
-            cd tests
+            cd src/tests
             python -m unittest
