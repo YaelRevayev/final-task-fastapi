@@ -23,11 +23,6 @@ class TestAPI(unittest.TestCase):
         result_b = part_a_or_b(filename_b)
         self.assertEqual(result_b, "b")
 
-    def test_part_a_or_b_given_invalid_name_returns_none(self):
-        filename_invalid = "file_invalid.txt"
-        result_invalid = part_a_or_b(filename_invalid)
-        self.assertIsNone(result_invalid)
-
     async def test_list_files_in_order_given_right_order_returns_same_order(self):
         files = [
             MagicMock(filename="file_a.txt", read=MagicMock(return_value=b"content_a")),

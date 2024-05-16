@@ -1,13 +1,15 @@
 import yaml
+import os
 
 
 def load_config(config_file):
+    print(os.getcwd())
     with open(config_file, "r") as file:
         config = yaml.safe_load(file)
     return config
 
 
-config_file = "config.yaml"
+config_file = "./src/configs/config.yaml"
 config = load_config(config_file)
 
 

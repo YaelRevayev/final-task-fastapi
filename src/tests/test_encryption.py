@@ -5,7 +5,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from encryption import sign_file, read_key_from_file
-from configs import config
+import configs as config
 
 
 class TestFileFunctions(unittest.TestCase):

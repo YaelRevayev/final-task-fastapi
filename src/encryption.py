@@ -8,7 +8,7 @@ project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)
 src_dir = os.path.join(project_dir, "configs")
 sys.path.append(project_dir)
 sys.path.insert(0, src_dir)
-import configs.config as config
+import configs as config
 
 
 def read_key_from_file(file_path):
