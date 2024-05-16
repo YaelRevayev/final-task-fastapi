@@ -21,13 +21,13 @@ on:
        description: 'Password for VM 2'
        required: true
      vm3-host:
-       description: 'Host for VM 2'
+       description: 'Host for VM 3'
        required: true
      vm3-username:
-       description: 'Username for VM 2'
+       description: 'Username for VM 3'
        required: true
      vm3-password:
-       description: 'Password for VM 2'
+       description: 'Password for VM 3'
        required: true
 jobs:
  deploy-on-vm:
