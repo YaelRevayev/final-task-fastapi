@@ -1,15 +1,10 @@
 from typing import List
 from fastapi import FastAPI, UploadFile, File
-import os
-import sys
-import logging
-import secrets
 from datetime import datetime
-
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-sys.path.append(os.path.join(project_dir, "configs"))
-sys.path.insert(0, os.path.join(project_dir, "src"))
+import os
 from encryption import read_key_from_file, sign_file
+import configs.config as config
+from logger import fastapi_logger
 
 app = FastAPI()
 
@@ -22,7 +17,7 @@ def part_a_or_b(filename):
             return None
         return part
     else:
-        return None
+        raise SyntaxError("file name syntax is invalid.")
 
 
 async def list_files_in_order(files):
@@ -38,28 +33,25 @@ async def list_files_in_order(files):
     return (part_a, part_b)
 
 
+def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
+    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    if filename.endswith("_a.jpg"):
+        merged_filename = filename[:-6] + ".jpg"
+    elif filename.endswith("_b"):
+        merged_filename = filename[:-2] + ".jpg"
+    with open("/{0}/merged_files/{1}".format(project_dir, merged_filename), "wb") as f:
+        f.write(merged_content + iv + encrypted_hash)
+    fastapi_logger.info("Merged file saved: %s", merged_filename)
+
+
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
-    from logger import merged_files_logger, error_logger
-
     try:
         part_a, part_b = await list_files_in_order(files)
         merged_content = part_a + part_b
-        # key = read_key_from_file(config.KEY_FILE_NAME)
-        key = secrets.token_bytes(32)
+        key = read_key_from_file(config.KEY_FILE_NAME)
         encrypted_hash, iv = sign_file(merged_content, key)
 
-        filename = files[1].filename
-        if filename.endswith("_a.jpg"):
-            merged_filename = filename[:-6] + ".jpg"
-        elif filename.endswith("_b"):
-            merged_filename = filename[:-2] + ".jpg"
-        print(merged_filename)
-        with open(
-            "/{0}/merged_files/{1}".format(project_dir, merged_filename), "wb"
-        ) as f:
-            f.write(merged_content + iv + encrypted_hash)
-
-        merged_files_logger.info("Merged file saved: %s", merged_filename)
+        write_to_merged_file(files[1].filename, merged_content, iv, encrypted_hash)
     except Exception as e:
-        error_logger.error("An error occurred: %s", str(e))
+        fastapi_logger.error("An error occurred: %s", str(e))

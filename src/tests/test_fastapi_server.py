@@ -5,9 +5,8 @@ from fastapi.testclient import TestClient
 import os
 import sys
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-sys.path.append(project_dir)
-from src.fastapi_server import app, part_a_or_b, list_files_in_order
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from fastapi_server import app, part_a_or_b, list_files_in_order
 
 
 class TestAPI(unittest.TestCase):
