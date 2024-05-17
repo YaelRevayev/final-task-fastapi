@@ -1,70 +1,64 @@
 name: deploy-code
+
 on:
- workflow_dispatch:
-   inputs:
-     vm1-host:
-       description: 'Host for VM 1'
-       required: true
-     vm1-username:
-       description: 'Username for VM 1'
-       required: true
-     vm1-password:
-       description: 'Password for VM 1'
-       required: true
-     vm2-host:
-       description: 'Host for VM 2'
-       required: true
-     vm2-username:
-       description: 'Username for VM 2'
-       required: true
-     vm2-password:
-       description: 'Password for VM 2'
-       required: true
-     vm3-host:
-       description: 'Host for VM 3'
-       required: true
-     vm3-username:
-       description: 'Username for VM 3'
-       required: true
-     vm3-password:
-       description: 'Password for VM 3'
-       required: true
+  workflow_dispatch:
+    inputs:
+      update_or_install:
+        description: 'Would you like to update the code or install it for the first time? (update/install)'
+        required: true
+        default: 'update'
+
 jobs:
- deploy-on-vm:
-   runs-on: ubuntu-latest
-   strategy:
-     matrix:
-       vm_index: [1, 2]
-   steps:
-     - name: Set up environment variables
-       run: |
-         echo "VM_HOST=${{ github.event.inputs[format('vm{0}-host', matrix.vm_index)] }}" >> $GITHUB_ENV
-         echo "VM_USERNAME=${{ github.event.inputs[format('vm{0}-username', matrix.vm_index)] }}" >> $GITHUB_ENV
-         echo "VM_PASSWORD=${{ github.event.inputs[format('vm{0}-password', matrix.vm_index)] }}" >> $GITHUB_ENV
-     - name: Execute commands on VM
-       uses: appleboy/ssh-action@v1.0.3
-       with:
-         host: ${{ env.VM_HOST }}
-         username: ${{ env.VM_USERNAME }}
-         password: ${{ env.VM_PASSWORD }}
-         port: 22
-         script: |
+  deploy-on-vm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vm_index: [1, 2, 3]  # Assuming you want to deploy to all three VMs
+    steps:
+      - name: Set up environment variables
+        run: |
+          if [ ${{ matrix.vm_index }} -eq 1 ]; then
+            echo "VM_HOST=40.76.184.13" >> $GITHUB_ENV
+            echo "VM_USERNAME=fastapi-vm1" >> $GITHUB_ENV
+            echo "VM_PASSWORD=Yael1234567890" >> $GITHUB_ENV
+          elif [ ${{ matrix.vm_index }} -eq 2 ]; then
+            echo "VM_HOST=20.55.100.106" >> $GITHUB_ENV
+            echo "VM_USERNAME=fastapi-vm2" >> $GITHUB_ENV
+            echo "VM_PASSWORD=Yael1234567890" >> $GITHUB_ENV
+          elif [ ${{ matrix.vm_index }} -eq 3 ]; then
+            echo "VM_HOST=172.178.85.40" >> $GITHUB_ENV
+            echo "VM_USERNAME=fastapi-vm3" >> $GITHUB_ENV
+            echo "VM_PASSWORD=Yael1234567890" >> $GITHUB_ENV
+          fi
+          echo "UPDATE_OR_INSTALL=${{ github.event.inputs.update_or_install }}" >> $GITHUB_ENV
+
+      - name: Execute commands on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.VM_HOST }}
+          username: ${{ env.VM_USERNAME }}
+          password: ${{ env.VM_PASSWORD }}
+          port: 22
+          script: |
             REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
-            if [ -d "$REPO_DIR" ]; then
-              echo "Repository exists"
-              cd "$REPO_DIR"
-              git reset --hard HEAD
-              git pull
+            if [ "${{ env.UPDATE_OR_INSTALL }}" == "update" ]; then
+               echo "Updating existing repository"
+               cd "$REPO_DIR"
+               git reset --hard HEAD
+               git pull
+            elif [ "${{ env.UPDATE_OR_INSTALL }}" == "install" ]; then
+               echo "Repository does not exist, installing"
+               git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
+               cd "$REPO_DIR"
+               sudo chmod +x dependencies/install_packages.sh
+               ./dependencies/install_packages.s
             else
-              echo "Repository does not exist"
-              git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
-              cd "$REPO_DIR"
-              sudo chmod +x dependencies/install_packages.sh
-              ./dependencies/install_packages.sh
-              sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
-              sudo systemctl start filebeat
-              sudo systemctl enable filebeat
+              echo "Invalid input for update_or_install: ${{ env.UPDATE_OR_INSTALL }}"
+              exit 1
             fi
+            sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
+            sudo systemctl start filebeat
+            sudo systemctl enable filebeat
             sudo cp "$REPO_DIR/configs/fastapi.service" /etc/systemd/system/
             sudo systemctl enable fastapi.service
             sudo sed -i "s|\${USER}|${{ env.VM_USERNAME }}|g" /etc/systemd/system/fastapi.service
