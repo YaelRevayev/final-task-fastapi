@@ -44,7 +44,6 @@ jobs:
             if [ "${{ env.UPDATE_OR_INSTALL }}" == "update" ]; then
                echo "Updating existing repository"
                cd "$REPO_DIR"
-               git reset --hard HEAD
                git pull
             elif [ "${{ env.UPDATE_OR_INSTALL }}" == "install" ]; then
                echo "Repository does not exist, installing"
