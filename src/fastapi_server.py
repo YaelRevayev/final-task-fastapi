@@ -35,13 +35,20 @@ async def list_files_in_order(files):
 
 def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
     project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-    
-    if filename.endswith("_a.jpg"):
-        merged_filename = filename[:-6] + ".jpg"
-    elif filename.endswith("_b"):
-        merged_filename = filename[:-2] + ".jpg"
+    SUFFIX_A = "_a.jpg"
+    SUFFIX_B = "_b"
+    EXTENSION = ".jpg"
 
-    with open("/{0}/merged_files/{1}".format(project_dir, merged_filename), "wb") as f:
+    if filename.endswith(SUFFIX_A):
+        merged_filename = filename[: -len(SUFFIX_A)] + EXTENSION
+    elif filename.endswith(SUFFIX_B):
+        merged_filename = filename[: -len(SUFFIX_B)] + EXTENSION
+    else:
+        raise ValueError("Filename does not end with a recognized suffix.")
+
+    merged_file_path = os.path.join(project_dir, "merged_files", merged_filename)
+
+    with open(merged_file_path, "wb") as f:
         f.write(merged_content + iv + encrypted_hash)
 
     fastapi_logger.info("Merged file saved: %s", merged_filename)
