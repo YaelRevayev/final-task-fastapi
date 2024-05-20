@@ -22,7 +22,6 @@ class TestFileFunctions(unittest.TestCase):
         read_data=b"this_is_a_longer_key_than_32_bytes",
     )
     def test_key_length_longer(self, mock_open_file):
-        # Test that the function raises a ValueError
         with self.assertRaises(ValueError):
             read_key_from_file("dummy_file_path")
 
@@ -32,7 +31,6 @@ class TestFileFunctions(unittest.TestCase):
         read_data=b"9a4b5e2c8f1d6a7b3c4e2f9a4b5e2c8f",
     )
     def test_key_length_exact(self, mock_open_file):
-        # Test that the function returns the key without modifications
         key = read_key_from_file("dummy_file_path")
         self.assertEqual(len(key), 32)
         self.assertEqual(key, b"9a4b5e2c8f1d6a7b3c4e2f9a4b5e2c8f")

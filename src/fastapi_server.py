@@ -10,27 +10,23 @@ app = FastAPI()
 
 
 def part_a_or_b(filename):
-    index_of_underscore = filename.find("_")
-    if index_of_underscore != -1 and index_of_underscore + 1 < len(filename):
-        part = filename[index_of_underscore + 1]
-        if part not in ["a", "b"]:
-            return None
-        return part
-    else:
-        raise SyntaxError("file name syntax is invalid.")
+    _, sep, suffix = filename.partition("_")
+    if suffix and suffix[0] in ["a", "b"]:
+        return suffix[0]
+    raise SyntaxError("file name syntax is invalid.")
 
 
 async def list_files_in_order(files):
-    part_a = None
-    part_b = None
+    parts = {"_a.jpg": None, "_b": None}
 
     for file in files:
         file_content = await file.read()
         if file.filename.endswith("_a.jpg"):
-            part_a = file_content
+            parts["_a.jpg"] = file_content
         elif file.filename.endswith("_b"):
-            part_b = file_content
-    return (part_a, part_b)
+            parts["_b"] = file_content
+
+    return (parts["_a.jpg"], parts["_b"])
 
 
 def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
