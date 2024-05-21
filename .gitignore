@@ -2,6 +2,6 @@ _pyache/
 
 **/__pycache__/
 
-merged_files/*
+merged_files/
 
-logs/*
+logs/

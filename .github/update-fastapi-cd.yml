@@ -1,4 +1,4 @@
-name: deploy-code
+name: update-fastapi-code
 
 on:
   workflow_dispatch:
@@ -41,20 +41,10 @@ jobs:
           port: 22
           script: |
             REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
-            if [ "${{ env.UPDATE_OR_INSTALL }}" == "update" ]; then
-               echo "Updating existing repository"
-               cd "$REPO_DIR"
-               git pull
-            elif [ "${{ env.UPDATE_OR_INSTALL }}" == "install" ]; then
-               echo "Repository does not exist, installing"
-               git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
-               cd "$REPO_DIR"
-               sudo chmod +x dependencies/install_packages.sh
-               ./dependencies/install_packages.s
-            else
-              echo "Invalid input for update_or_install: ${{ env.UPDATE_OR_INSTALL }}"
-              exit 1
-            fi
+            echo "Updating existing repository"
+            cd "$REPO_DIR"
+            git pull
+
             sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
             sudo systemctl start filebeat
             sudo systemctl enable filebeat
