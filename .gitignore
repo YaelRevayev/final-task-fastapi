@@ -1,5 +1,7 @@
 _pyache/
 
+**/__pycache__/
+
 merged_files/*
 
 logs/*
