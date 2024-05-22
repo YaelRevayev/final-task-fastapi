@@ -21,6 +21,8 @@ jobs:
         - name: Test with unittest
           run: |
             sudo mkdir logs
+            sudo chmod 777 logs
             sudo mkdir merged_files
+            sudo chmod 777 merged_files
             cd src/tests
             python -m unittest
