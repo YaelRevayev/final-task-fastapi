@@ -1,48 +1,59 @@
-from typing import List
+from typing import List, Tuple
 from fastapi import FastAPI, UploadFile, File
-from datetime import datetime
 import os
 from encryption import read_key_from_file, sign_file
-import configs as config
+from configs import config
 from logger import fastapi_logger
 
 app = FastAPI()
 
-
-def part_a_or_b(filename):
-    _, sep, suffix = filename.partition("_")
-    if suffix and suffix[0] in ["a", "b"]:
-        return suffix[0]
-    raise SyntaxError("file name syntax is invalid.")
+SUFFIX_A = "_a.jpg"
+SUFFIX_B = "_b"
+EXTENSION = ".jpg"
 
 
-async def list_files_in_order(files):
-    parts = {"_a.jpg": None, "_b": None}
-
-    for file in files:
-        file_content = await file.read()
-        if file.filename.endswith("_a.jpg"):
-            parts["_a.jpg"] = file_content
-        elif file.filename.endswith("_b"):
-            parts["_b"] = file_content
-
-    return (parts["_a.jpg"], parts["_b"])
+def get_project_dir() -> str:
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
 
-def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-    SUFFIX_A = "_a.jpg"
-    SUFFIX_B = "_b"
-    EXTENSION = ".jpg"
-
+def split_filename(filename: str) -> str:
     if filename.endswith(SUFFIX_A):
-        merged_filename = filename[: -len(SUFFIX_A)] + EXTENSION
+        return filename[: -len(SUFFIX_A)] + EXTENSION
     elif filename.endswith(SUFFIX_B):
-        merged_filename = filename[: -len(SUFFIX_B)] + EXTENSION
+        return filename[: -len(SUFFIX_B)] + EXTENSION
     else:
         raise ValueError("Filename does not end with a recognized suffix.")
 
+
+async def extract_files_in_order(files: List[UploadFile]) -> Tuple[bytes, bytes]:
+    parts = {SUFFIX_A: None, SUFFIX_B: None}
+
+    for file in files:
+        file_content = await file.read()
+        suffix = get_file_suffix(file.filename)
+        if suffix in parts:
+            parts[suffix] = file_content
+
+    return parts[SUFFIX_A], parts[SUFFIX_B]
+
+
+def get_file_suffix(filename: str) -> str:
+    if filename.endswith(SUFFIX_A):
+        return SUFFIX_A
+    elif filename.endswith(SUFFIX_B):
+        return SUFFIX_B
+    else:
+        raise ValueError("Filename does not end with a recognized suffix.")
+
+
+def write_to_merged_file(
+    filename: str, merged_content: bytes, iv: bytes, encrypted_hash: bytes
+):
+    merged_filename = split_filename(filename)
+    project_dir = get_project_dir()
     merged_file_path = os.path.join(project_dir, "merged_files", merged_filename)
+
+    os.makedirs(os.path.dirname(merged_file_path), exist_ok=True)
 
     with open(merged_file_path, "wb") as f:
         f.write(merged_content + iv + encrypted_hash)
@@ -53,7 +64,7 @@ def write_to_merged_file(filename, merged_content, iv, encrypted_hash):
 @app.post("/merge_and_sign")
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
-        part_a, part_b = await list_files_in_order(files)
+        part_a, part_b = await extract_files_in_order(files)
         merged_content = part_a + part_b
         key = read_key_from_file(config.KEY_FILE_NAME)
         encrypted_hash, iv = sign_file(merged_content, key)

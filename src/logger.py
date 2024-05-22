@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 
 
-def configure_logger(logger_name, handlers, log_level=logging.INFO):
+def configure_logger(logger_name: str, handlers: dict, log_level=logging.INFO):
     logger = logging.getLogger(logger_name)
     formatter = logging.Formatter(
         "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"

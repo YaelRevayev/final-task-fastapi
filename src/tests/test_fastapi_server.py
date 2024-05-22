@@ -6,41 +6,33 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from fastapi_server import app, part_a_or_b, list_files_in_order
+from fastapi_server import app, extract_files_in_order
 
 
 class TestAPI(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
 
-    def test_part_a_or_b_given_part_a_returns_a(self):
-        filename_a = "file_a.txt"
-        result_a = part_a_or_b(filename_a)
-        self.assertEqual(result_a, "a")
-
-    def test_part_a_or_b_given_part_b_returns_b(self):
-        filename_b = "file_b.txt"
-        result_b = part_a_or_b(filename_b)
-        self.assertEqual(result_b, "b")
-
-    async def test_list_files_in_order_given_right_order_returns_same_order(self):
+    async def test_extract_files_in_order_given_right_order_returns_same_order(self):
         files = [
             MagicMock(filename="file_a.txt", read=MagicMock(return_value=b"content_a")),
             MagicMock(filename="file_b.txt", read=MagicMock(return_value=b"content_b")),
         ]
 
-        result = await list_files_in_order(files)
+        result = await extract_files_in_order(files)
 
         expected_result = (b"content_a", b"content_b")
         self.assertEqual(result, expected_result)
 
-    async def test_list_files_in_order_given_wrong_order_returns_opposite_order(self):
+    async def test_extract_files_in_order_given_wrong_order_returns_opposite_order(
+        self,
+    ):
         files = [
             MagicMock(filename="file_b.txt", read=MagicMock(return_value=b"content_b")),
             MagicMock(filename="file_a.txt", read=MagicMock(return_value=b"content_a")),
         ]
 
-        result = await list_files_in_order(files)
+        result = await extract_files_in_order(files)
 
         expected_result = (b"content_a", b"content_b")
         self.assertEqual(result, expected_result)

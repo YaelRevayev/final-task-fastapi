@@ -2,9 +2,10 @@ import unittest
 from unittest.mock import MagicMock, patch, mock_open
 import os
 import sys
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from encryption import sign_file, read_key_from_file
-import configs as config
+from configs import config
 
 
 class TestFileFunctions(unittest.TestCase):

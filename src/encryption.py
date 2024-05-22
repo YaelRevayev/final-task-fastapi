@@ -2,10 +2,10 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-import configs as config
+from configs import config
 
 
-def read_key_from_file(file_path):
+def read_key_from_file(file_path: str):
     with open(file_path, "rb") as file:
         key = file.read()
 
