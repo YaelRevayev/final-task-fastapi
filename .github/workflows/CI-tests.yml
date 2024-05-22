@@ -20,5 +20,7 @@ jobs:
              pip install -r requirements.txt
         - name: Test with unittest
           run: |
+            sudo mkdir logs
+            sudo mkdir merged_files
             cd src/tests
             python -m unittest
