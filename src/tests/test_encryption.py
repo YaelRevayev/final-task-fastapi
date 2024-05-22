@@ -8,7 +8,7 @@ from encryption import sign_file, read_key_from_file
 from configs import config
 
 
-class TestFileFunctions(unittest.TestCase):
+class TestEncryption(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data=b"short_key")
     def test_key_length_given_shorter_key_should_add_empty_spaces(self, mock_open_file):
