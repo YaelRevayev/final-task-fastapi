@@ -65,10 +65,15 @@ def write_to_merged_file(
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
         part_a, part_b = await extract_files_in_order(files)
-        merged_content = part_a + part_b
-        key = read_key_from_file(config.KEY_FILE_NAME)
-        encrypted_hash, iv = sign_file(merged_content, key)
 
-        write_to_merged_file(files[1].filename, merged_content, iv, encrypted_hash)
+        # Check if both parts are not None before concatenating
+        if part_a is not None and part_b is not None:
+            merged_content = part_a + part_b
+            key = read_key_from_file(config.KEY_FILE_NAME)
+            encrypted_hash, iv = sign_file(merged_content, key)
+
+            write_to_merged_file(files[1].filename, merged_content, iv, encrypted_hash)
+        else:
+            fastapi_logger.error("One or both parts are missing.")
     except Exception as e:
         fastapi_logger.error("An error occurred: %s", str(e))
