@@ -69,7 +69,7 @@ async def merge_files(files: List[UploadFile] = File(...)):
         print(f"part a --> {part_a}")
         print(f"part b --> {part_b}")
         # Check if both parts are not None before concatenating
-        if part_a is not None and part_b is not None:
+        if part_a is bytes and part_b is bytes:
             merged_content = part_a + part_b
             key = read_key_from_file(config.KEY_FILE_NAME)
             encrypted_hash, iv = sign_file(merged_content, key)
