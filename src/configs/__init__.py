@@ -13,6 +13,10 @@ class AppConfig:
 
     @classmethod
     def load(cls, config_file):
+        project_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), os.pardir)
+        )
+        os.chdir(project_dir)
         with open(config_file, "r") as file:
             config_data = yaml.safe_load(file)
         return cls(**config_data)
