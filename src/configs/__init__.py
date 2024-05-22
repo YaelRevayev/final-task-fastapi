@@ -18,5 +18,5 @@ class AppConfig:
         return cls(**config_data)
 
 
-config_file = "../configs/config.yaml"
+config_file = "../../configs/config.yaml"
 config = AppConfig.load(config_file)
