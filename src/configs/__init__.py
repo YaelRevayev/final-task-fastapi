@@ -9,6 +9,7 @@ class AppConfig:
     AES_KEY_LENGTH: int
     IV_BYTES_LENGTH: int
     KEY_FILE_NAME: str
+    HTTP_PORT: int
 
     @classmethod
     def load(cls, config_file):
