@@ -3,7 +3,7 @@ name: install-fastapi-code
 on:
   push:
       tags:
-      - 'update-fastapi-code'
+      - 'install-fastapi-code'
 
 jobs:
   deploy-on-vm:
