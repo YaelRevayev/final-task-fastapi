@@ -1,12 +1,9 @@
 name: install-fastapi-code
 
 on:
-  workflow_dispatch:
-    inputs:
-      update_or_install:
-        description: 'Would you like to update the code or install it for the first time? (update/install)'
-        required: true
-        default: 'update'
+  push:
+      tags:
+      - 'install-fastapi-code'
 
 jobs:
   deploy-on-vm:
@@ -40,8 +37,9 @@ jobs:
           password: ${{ env.VM_PASSWORD }}
           port: 22
           script: |
-            REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
+            REPO_DIR="/home/${{ github.event.repository.name }}"
             echo "Repository does not exist, installing"
+            cd /home/
             git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
             cd "$REPO_DIR"
             sudo mkdir logs
@@ -52,7 +50,7 @@ jobs:
             ./dependencies/install_packages.s
             
             sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
-            sudo systemctl start filebeat
+            sudo systemctl restart filebeat
             sudo systemctl enable filebeat
             sudo cp "$REPO_DIR/dependencies/fastapi.service" /etc/systemd/system/
             sudo systemctl enable fastapi.service
