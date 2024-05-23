@@ -10,6 +10,7 @@ app = FastAPI()
 SUFFIX_A = "_a.jpg"
 SUFFIX_B = "_b"
 EXTENSION = ".jpg"
+key = read_key_from_file(config.KEY_FILE_NAME)
 
 
 def get_project_dir() -> str:
@@ -43,7 +44,6 @@ def get_file_suffix(filename: str) -> str:
     elif filename.endswith(SUFFIX_B):
         return SUFFIX_B
     else:
-        print(f"not recognized prefix --" > {filename})
         raise ValueError("Filename does not end with a recognized suffix.")
 
 
@@ -66,11 +66,8 @@ def write_to_merged_file(
 async def merge_files(files: List[UploadFile] = File(...)):
     try:
         part_a, part_b = await extract_files_in_order(files)
-        print(f"part a --> {part_a}")
-        print(f"part b --> {part_b}")
         if isinstance(part_a, bytes) and isinstance(part_b, bytes):
             merged_content = part_a + part_b
-            key = read_key_from_file(config.KEY_FILE_NAME)
             encrypted_hash, iv = sign_file(merged_content, key)
 
             write_to_merged_file(files[1].filename, merged_content, iv, encrypted_hash)
