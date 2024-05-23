@@ -1,4 +1,4 @@
-name: ci-test-actions
+name: test-fastapi-code
 run-name: ${{ github.actor }} is testing code
 on:
   push:
