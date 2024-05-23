@@ -13,7 +13,6 @@ def configure_logger(logger_name: str, handlers: list, log_level=logging.INFO):
     for handler_path, level in handlers:
         # Ensure the directory for log files exists
         os.makedirs(os.path.dirname(handler_path), exist_ok=True)
-
         handler = logging.FileHandler(handler_path)
         handler.setFormatter(formatter)
         handler.setLevel(level)

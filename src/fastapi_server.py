@@ -43,6 +43,7 @@ def get_file_suffix(filename: str) -> str:
     elif filename.endswith(SUFFIX_B):
         return SUFFIX_B
     else:
+        print(f"not recognized prefix --" > {filename})
         raise ValueError("Filename does not end with a recognized suffix.")
 
 
@@ -68,8 +69,7 @@ async def merge_files(files: List[UploadFile] = File(...)):
         part_a, part_b = await extract_files_in_order(files)
         print(f"part a --> {part_a}")
         print(f"part b --> {part_b}")
-        # Check if both parts are not None before concatenating
-        if part_a is bytes and part_b is bytes:
+        if isinstance(part_a, bytes) and isinstance(part_b, bytes):
             merged_content = part_a + part_b
             key = read_key_from_file(config.KEY_FILE_NAME)
             encrypted_hash, iv = sign_file(merged_content, key)
