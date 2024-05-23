@@ -30,19 +30,13 @@ def configure_logger(logger_name: str, log_files: dict):
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 logs_folder_path = os.path.join(root_path, "logs")
 
-handlers = [
-    (
-        os.path.join(
-            logs_folder_path,
-            f"success_file_merging_{datetime.now().strftime('%Y-%m-%d')}.log",
-        ),
-        logging.INFO,
-    ),
-    (os.path.join(logs_folder_path, "error_fastapi.log"), logging.ERROR),
-    (
-        os.path.join(logs_folder_path, "debug_fastapi.log"),
-        logging.DEBUG,
-    ),
-]
+handlers = {
+    os.path.join(
+        logs_folder_path,
+        f"success_file_merging_{datetime.now().strftime('%Y-%m-%d')}.log",
+    ): logging.INFO,
+    os.path.join(logs_folder_path, "error_fastapi.log"): logging.ERROR,
+    os.path.join(logs_folder_path, "debug_fastapi.log"): logging.DEBUG,
+}
 
 fastapi_logger = configure_logger("fastapi_logger", handlers)
