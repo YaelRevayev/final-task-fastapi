@@ -2,6 +2,7 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from configs import config
+from typing import Tuple
 
 
 def read_key_from_file(file_path: str):
@@ -16,7 +17,7 @@ def read_key_from_file(file_path: str):
     return key
 
 
-def sign_file(content, key):
+def sign_file(content: bytes, key: bytes) -> Tuple[bytes, bytes]:
     sha512_hash = hashlib.sha512(content).hexdigest()
     iv = get_random_bytes(config.IV_BYTES_LENGTH)
     cipher = AES.new(key, AES.MODE_CFB, iv)

@@ -50,7 +50,6 @@ def get_file_suffix(filename: str) -> str:
 def write_to_merged_file(
     filename: str, merged_content: bytes, iv: bytes, encrypted_hash: bytes
 ):
-    print(filename)
     merged_filename = split_filename(filename)
     project_dir = get_project_dir()
     merged_file_path = os.path.join(project_dir, "merged_files", merged_filename)
