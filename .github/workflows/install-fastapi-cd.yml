@@ -42,6 +42,7 @@ jobs:
           script: |
             REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
             echo "Repository does not exist, installing"
+            cd /home/
             git clone https://github.com/${{ github.repository }}.git "$REPO_DIR"
             cd "$REPO_DIR"
             sudo mkdir logs
