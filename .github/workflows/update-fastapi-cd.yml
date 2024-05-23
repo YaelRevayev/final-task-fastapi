@@ -1,5 +1,4 @@
 name: update-fastapi-code
-
 on:
   workflow_dispatch:
     inputs:
@@ -7,7 +6,9 @@ on:
         description: 'Would you like to update the code or install it for the first time? (update/install)'
         required: true
         default: 'update'
-
+  push:
+      tags:
+      - 'update-fastapi-code'
 jobs:
   deploy-on-vm:
     runs-on: ubuntu-latest
