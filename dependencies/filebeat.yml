@@ -15,13 +15,13 @@
 filebeat.inputs:
 - type: log
   paths:
-    - /home/fastapi-vm3/final-task-fastapi/logs/success*.log
+    - /home/final-task-fastapi/logs/success*.log
   fields:
     log_type: fastapi-success
 
 - type: log
   paths:
-    - /home/fastapi-vm3/final-task-fastapi/logs/error*.log
+    - /home/final-task-fastapi/logs/error*.log
   fields:
     log_type: fastapi-error
 
