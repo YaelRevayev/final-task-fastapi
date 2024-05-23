@@ -42,6 +42,7 @@ jobs:
           script: |
             REPO_DIR="/home/${{ env.VM_USERNAME }}/${{ github.event.repository.name }}"
             echo "Updating existing repository"
+            cd /home/
             cd "$REPO_DIR"
             git pull
 
