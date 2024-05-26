@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vm_index: [1, 2, 3]  # Assuming you want to deploy to all three VMs
+        vm_index: [1, 2, 3] 
     steps:
       - name: Set up environment variables
         run: |
