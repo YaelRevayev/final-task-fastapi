@@ -142,7 +142,6 @@ output.elasticsearch:
 
 setup.ilm.enabled: false
 setup.template.enabled: true
-setup.ilm.policy_name: "my_filebeat_policy"
 setup.template.name: "fastapi"  # Name of the index template
 setup.template.pattern: "fastapi-*"
 
