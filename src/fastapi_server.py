@@ -13,6 +13,7 @@ EXTENSION = ".jpg"
 key = read_key_from_file(config.KEY_FILE_NAME)
 
 
+
 def get_project_dir() -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
