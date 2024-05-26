@@ -24,6 +24,7 @@ def split_filename(filename: str) -> str:
     elif filename.endswith(SUFFIX_B):
         return filename[: -len(SUFFIX_B)] + EXTENSION
     else:
+        fastapi_logger.debug(filename)
         raise ValueError("Filename does not end with a recognized suffix.")
 
 
