@@ -139,10 +139,10 @@ output.elasticsearch:
 
   index: "%{[fields.log_type]}-%{+yyyy.MM.dd}"
 
-setup.ilm.enabled: false
-setup.template.enabled: true
-setup.template.name: "fastapi"  # Name of the index template
-setup.template.pattern: "fastapi-*"
+#setup.ilm.enabled: false
+#setup.template.enabled: true
+#setup.template.name: "fastapi"  # Name of the index template
+#setup.template.pattern: "fastapi-*"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
