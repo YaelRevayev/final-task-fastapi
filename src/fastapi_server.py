@@ -27,7 +27,6 @@ def split_filename(filename: str) -> str:
         fastapi_logger.debug(filename)
         raise ValueError("Filename does not end with a recognized suffix.")
 
-
 async def extract_files_in_order(files: List[UploadFile]) -> Tuple[bytes, bytes]:
     parts = {SUFFIX_A: None, SUFFIX_B: None}
 
@@ -38,6 +37,7 @@ async def extract_files_in_order(files: List[UploadFile]) -> Tuple[bytes, bytes]
             parts[suffix] = file_content
 
     return parts[SUFFIX_A], parts[SUFFIX_B]
+
 
 
 def get_file_suffix(filename: str) -> str:
