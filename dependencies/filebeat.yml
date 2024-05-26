@@ -5,8 +5,7 @@
 # supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/filebeat/index.html
-
+# https://www.elastic.co/guide/en/beats/filebeat/ind
 
 # For more available modules and options, please see the filebeat.reference.yml sample
 # ============================== Filebeat inputs ===============================
