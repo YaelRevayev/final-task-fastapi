@@ -10,6 +10,7 @@ class AppConfig:
     IV_BYTES_LENGTH: int
     KEY_FILE_NAME: str
     HTTP_PORT: int
+    MERGED_FILES_DIR_NAME: str
 
     @classmethod
     def load(cls, config_file):

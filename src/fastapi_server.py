@@ -5,7 +5,6 @@ from encryption import read_key_from_file, sign_file
 from logger import fastapi_logger
 from configs import config
 
-
 app = FastAPI()
 
 SUFFIX_A = "_a.jpg"
@@ -52,9 +51,12 @@ def get_file_suffix(filename: str) -> str:
 def write_to_merged_file(
     filename: str, merged_content: bytes, iv: bytes, encrypted_hash: bytes
 ):
+    fastapi_logger.debug("writing merged content to new file..")
     merged_filename = split_filename(filename)
     project_dir = get_project_dir()
-    merged_file_path = os.path.join(project_dir, "merged_files", merged_filename)
+    merged_file_path = os.path.join(
+        project_dir, config.MERGED_FILES_DIR_NAME, merged_filename
+    )
 
     os.makedirs(os.path.dirname(merged_file_path), exist_ok=True)
 

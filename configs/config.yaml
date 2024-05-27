@@ -3,3 +3,4 @@ AES_KEY_LENGTH: 32
 IV_BYTES_LENGTH: 16
 KEY_FILE_NAME: "../dependencies/tornado.key"
 HTTP_PORT: 8000
+MERGED_FILES_DIR_NAME: "merged_files"
