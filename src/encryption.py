@@ -18,7 +18,6 @@ def read_key_from_file(file_path: str):
 
     return key
 
-
 def sign_file(content: bytes, key: bytes) -> Tuple[bytes, bytes]:
     fastapi_logger.debug("Signing file..")
     sha512_hash = hashlib.sha512(content).hexdigest()

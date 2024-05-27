@@ -2,7 +2,7 @@ name: update-fastapi-code
 on:
   push:
       tags:
-      - 'update-fastapi-code'
+      - 'update-fastapi'
 jobs:
   deploy-on-vm:
     runs-on: ubuntu-latest
