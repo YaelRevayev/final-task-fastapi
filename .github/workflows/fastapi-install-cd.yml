@@ -47,8 +47,10 @@ jobs:
             sudo chmod 777 logs
             sudo chmod 777 merged_files
             sudo chmod +x dependencies/install_packages.sh
-            ./dependencies/install_packages.s
-            
+            ./dependencies/install_packages.sh
+            # Download and install Filebeat
+            sudo wget -P /home/ https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.16.3-amd64.deb
+            sudo dpkg -i /home/filebeat-7.16.3-amd64.deb
             sudo cp $REPO_DIR/dependencies/filebeat.yml /etc/filebeat/
             sudo systemctl restart filebeat
             sudo systemctl enable filebeat
