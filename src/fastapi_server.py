@@ -6,10 +6,6 @@ from logger import fastapi_logger
 from configs import config
 
 app = FastAPI()
-
-SUFFIX_A = "_a.jpg"
-SUFFIX_B = "_b"
-EXTENSION = ".jpg"
 key = read_key_from_file(config.KEY_FILE_NAME)
 
 
@@ -18,17 +14,17 @@ def get_project_dir() -> str:
 
 
 def split_filename(filename: str) -> str:
-    if filename.endswith(SUFFIX_A):
-        return filename[: -len(SUFFIX_A)] + EXTENSION
-    elif filename.endswith(SUFFIX_B):
-        return filename[: -len(SUFFIX_B)] + EXTENSION
+    if filename.endswith(config.SUFFIX_A):
+        return filename[: -len(config.SUFFIX_A)] + config.EXTENSION
+    elif filename.endswith(config.SUFFIX_B):
+        return filename[: -len(config.SUFFIX_B)] + config.EXTENSION
     else:
         fastapi_logger.debug(filename)
         raise ValueError("Filename does not end with a recognized suffix.")
 
 
 async def extract_files_in_order(files: List[UploadFile]) -> Tuple[bytes, bytes]:
-    parts = {SUFFIX_A: None, SUFFIX_B: None}
+    parts = {config.SUFFIX_A: None, config.SUFFIX_B: None}
 
     for file in files:
         file_content = await file.read()
@@ -36,14 +32,14 @@ async def extract_files_in_order(files: List[UploadFile]) -> Tuple[bytes, bytes]
         if suffix in parts:
             parts[suffix] = file_content
 
-    return parts[SUFFIX_A], parts[SUFFIX_B]
+    return parts[config.SUFFIX_A], parts[config.SUFFIX_B]
 
 
 def get_file_suffix(filename: str) -> str:
-    if filename.endswith(SUFFIX_A):
-        return SUFFIX_A
-    elif filename.endswith(SUFFIX_B):
-        return SUFFIX_B
+    if filename.endswith(config.SUFFIX_A):
+        return config.SUFFIX_A
+    elif filename.endswith(config.SUFFIX_B):
+        return config.SUFFIX_B
     else:
         raise ValueError("Filename does not end with a recognized suffix.")
 

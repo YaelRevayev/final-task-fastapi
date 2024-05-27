@@ -4,3 +4,6 @@ IV_BYTES_LENGTH: 16
 KEY_FILE_NAME: "../dependencies/tornado.key"
 HTTP_PORT: 8000
 MERGED_FILES_DIR_NAME: "merged_files"
+SUFFIX_A: "_a.jpg"
+SUFFIX_B: "_b"
+EXTENSION: ".jpg"

@@ -11,6 +11,9 @@ class AppConfig:
     KEY_FILE_NAME: str
     HTTP_PORT: int
     MERGED_FILES_DIR_NAME: str
+    EXTENSION: str
+    SUFFIX_B: str
+    SUFFIX_A: str
 
     @classmethod
     def load(cls, config_file):
